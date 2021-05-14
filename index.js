@@ -1,7 +1,7 @@
 const JZZ = require("jzz");
 
 try {
-    JZZ()
+    JZZ().or("Failed here")
 } catch (err) {
     console.error("Failed")
 }
