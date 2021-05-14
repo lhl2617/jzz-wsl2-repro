@@ -41,10 +41,10 @@ jobs:
           distribution: Ubuntu-20.04
       - name: Install dependencies
         run: |
-          sudo apt install curl
+          sudo apt-get install curl
           curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
           sudo apt-get install -y nodejs
-          sudo apt install npm
+          sudo apt-get install npm
           npm -v
           node -v
       - name: Checkout code
@@ -56,4 +56,39 @@ jobs:
       - name: Install Dependencies
         run: npm i
       - name: Run 
+        run: npm run start
+
+  repro-wsl2:
+    runs-on: windows-latest
+    steps:
+      - name: Setup WSL Ubuntu-20.04
+        uses: Vampire/setup-wsl@v1
+        with:
+          distribution: Ubuntu-20.04
+      - name: Try to upgrade to wsl2
+        run: |
+          wsl -l -v
+          wsl --set-version Ubuntu-20.04 2
+          wsl -l -v
+      - name: Install dependencies
+        shell: wsl-bash {0}
+        run: |
+          sudo apt-get install curl
+          curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          sudo apt-get install npm
+          npm -v
+          node -v
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Collect system info
+        shell: wsl-bash {0}
+        run: |
+          uname -a
+          cat /etc/issue
+      - name: Install Dependencies
+        shell: wsl-bash {0}
+        run: npm i
+      - name: Run 
+        shell: wsl-bash {0}
         run: npm run start
