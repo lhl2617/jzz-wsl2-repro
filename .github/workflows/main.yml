@@ -1,0 +1,59 @@
+  
+name: Main
+
+on: push
+
+jobs:
+  repro-docker:
+    runs-on: ubuntu-latest
+    container: mhart/alpine-node:12
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm i
+      - name: Run 
+        run: npm run start
+        
+  repro-cross-platform:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: npm i
+      - name: Run 
+        run: npm run start
+
+  repro-wsl1:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: wsl-bash {0}
+    steps:
+      - name: Setup WSL Ubuntu-20.04
+        uses: Vampire/setup-wsl@v1
+        with:
+          distribution: Ubuntu-20.04
+      - name: Install dependencies
+        run: |
+          sudo apt install curl
+          curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+          sudo apt install npm
+          npm -v
+          node -v
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Collect system info
+        run: |
+          uname -a
+          cat /etc/issue
+      - name: Install Dependencies
+        run: npm i
+      - name: Run 
+        run: npm run start
